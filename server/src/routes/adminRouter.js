@@ -120,6 +120,19 @@ adminRouter.post('/admin/:id/removeFlights',async(req, res) => {
   }
 })
 
+adminRouter.get('/admin/:id/viewAllBookings',async(req,res) => {
+  if(req.session.loggedIn){
+    await db.query("SELECT * FROM bookings",(err, dbres) => {
+      if(err) {
+        console.log(err)
+      }
+      else{
+        res.render(path.join(__dirname,"..","views","admin","viewAllBookings.ejs"),{allBookings:dbres.rows});
+
+      }
+    })
+  }
+})
 
 
 module.exports = adminRouter;

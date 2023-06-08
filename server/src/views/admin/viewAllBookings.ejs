@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>All Bookings:</h1>
+
+          <%for(let x=0;x<allBookings.length;x++){%>
+            <div>
+            <hr>
+            <li >BOOKING ID: <%=allBookings[x].id%></li>
+            <li >USER ID: <%=allBookings[x].user_id%></li>
+            <li>FLIGHT ID: <%=allBookings[x].flight_id%></li>
+            <li>FLIGHT NUMBER: <%=allBookings[x].flight_number%></li>
+            <li>PRICE: <%=allBookings[x].price%></li>
+            <hr>
+           </div>
+          <%}%>
+
+</body>
+</html>
