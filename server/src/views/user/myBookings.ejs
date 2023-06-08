@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="main" id="vueControl">
+
+        <div>
+          <h1>My Bookings</h1>
+
+          <%for(let x=0;x<allBookings.length;x++){%>
+            <div id="<%=x%>">
+            <hr>
+            <li >BOOKING ID: <%=allBookings[x].id%></li>
+            <li>FLIGHT NUMBER: <%=allBookings[x].flight_number%></li>
+            <li>PRICE: <%=allBookings[x].price%></li>
+            <button @click="removeBooking(<%=allBookings[x].id%>,<%=x%>)">REMOVE</button>
+            <hr>
+           </div>
+          <%}%>
+        </div>
+      </div>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script type="module">
+        import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+        const userId = '<%=userId%>';
+        // const fid=document.getElementById("fid");
+        const app = createApp({
+          data() {
+            return {
+                 
+                 uid:userId
+            };
+          },
+          methods: {
+            removeBooking(x,y) {
+            console.log(x);
+            let bid = document.getElementById(y);
+            bid.style.display="none";
+            axios({
+              method: "post",
+              url: `/user/${this.uid}/removeBooking`,
+              data: {
+                  booking_id:x,
+              },
+            }).then((obj) => {console.log(obj)})
+            .catch((err) => {console.log(err)});
+              
+            }
+            
+          },
+        });
+  
+        app.mount("#vueControl");
+      </script>
+ 
+    
+</body>
+</html>

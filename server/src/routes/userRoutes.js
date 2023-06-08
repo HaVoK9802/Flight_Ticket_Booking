@@ -119,4 +119,58 @@ userRouter.post("/user/:id/bookFlight",async(req,res)=>{
     }
 })
 
+userRouter.get("/user/:id/myBookings",async(req, res) => {
+    if(req.session.loggedIn){
+      db.query("SELECT * FROM bookings WHERE user_id=$1",[req.params.id],(err,dbres)=>{
+        if(err){
+           console.log(err);
+        }
+        else{
+            res.render(path.join(__dirname, "..", "views", "user", "myBookings.ejs"), {userId: req.params.id, allBookings:dbres.rows})
+        }
+      })
+    }
+    else{
+        res.send("Not Logged In");
+    }
+})
+
+userRouter.post('/user/:id/removeBooking',async(req, res) => {
+    if(req.session.loggedIn){
+   
+
+            let vcny = 0;
+            await db.query("SELECT vaccancy,f.id FROM flights as f WHERE f.id IN (SELECT flight_id FROM bookings as b WHERE b.id =$1);",[req.body.booking_id],
+            (err,dbres)=>{
+                 if(err){
+                    console.log(err);
+                 }
+                 else{
+
+                     vcny = parseInt(dbres.rows[0].vaccancy)-1;
+                     let fid = dbres.rows[0].id;
+
+                     db.query("UPDATE flights SET vaccancy=$1 WHERE id =$2;",[vcny,fid],(err)=>{
+                         if(err){
+                             console.log(err);
+                         }
+                         else{
+                            db.query("DELETE FROM Bookings WHERE id=$1",[req.body.booking_id],(err) => {
+                                if(err){
+                                    console.log(err);
+                                }
+                                else{
+                                    console.log("booking cancelled")
+                                }
+                            });
+                         }
+                     })
+                     
+                 }
+            })
+        }
+    
+    
+  })
+
 module.exports = userRouter;
