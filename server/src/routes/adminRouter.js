@@ -134,5 +134,12 @@ adminRouter.get('/admin/:id/viewAllBookings',async(req,res) => {
   }
 })
 
+adminRouter.get("/admin/:id/logout",(req, res) => {
+  req.session.loggedIn = false;
+  req.session.destroy();
+  res.send("Logged Out");
+  
+})
+
 
 module.exports = adminRouter;

@@ -173,4 +173,12 @@ userRouter.post('/user/:id/removeBooking',async(req, res) => {
     
   })
 
+  
+userRouter.get("/user/:id/logout",(req, res) => {
+    req.session.loggedIn = false;
+    req.session.destroy();
+    res.send("Logged Out");
+    
+  })
+
 module.exports = userRouter;
