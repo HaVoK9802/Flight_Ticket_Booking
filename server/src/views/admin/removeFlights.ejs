@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="main" id="vueControl">
+        <div class="navbar">
+          <li @click="goToRemoveFlight">Remove Flights</li>
+          <li @click="viewAllBookings">View All Bookings</li>
+        </div>
+        <div>
+          <h1>Remove Flights</h1>
+
+          <%for(let x=0;x<allFlights.length;x++){%>
+            <div id="<%=x%>">
+            <hr>
+            <li >Flight ID: <%=allFlights[x].id%></li>
+            <li>Flight NUMBER: <%=allFlights[x].flight_number%></li>
+            <li>From: <%=allFlights[x].origin%></li>
+            <li>To: <%=allFlights[x].destination%></li>
+            <li>Deparure Time: <%=allFlights[x].departure_time%></li>
+            <li>Arrival Time: <%=allFlights[x].arrival_time%></li>
+            <button @click="removeFlight(<%=allFlights[x].id%>,<%=x%>)">REMOVE</button>
+            <hr>
+           </div>
+          <%}%>
+        </div>
+      </div>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script type="module">
+        import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+        const userId = '<%=userId%>';
+        // const fid=document.getElementById("fid");
+        const app = createApp({
+          data() {
+            return {
+                 
+                 uid:userId
+            };
+          },
+          methods: {
+            removeFlight(x,y) {
+            console.log(x);
+            let fid = document.getElementById(y);
+            fid.style.display="none";
+            axios({
+              method: "post",
+              url: `/admin/${this.uid}/removeFlights`,
+              data: {
+                  flight_id:x,
+              },
+            }).then((obj) => {console.log(obj)})
+            .catch((err) => {console.log(err)});
+              // window.location.href=`/admin/${this.userId}/removeFlights`;
+              
+            }
+            
+          },
+          watch: {
+        
+          },
+        });
+  
+        app.mount("#vueControl");
+      </script>
+ 
+    
+</body>
+</html>

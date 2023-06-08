@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="okay">
+      <input
+        type="text"
+        v-model="from"
+        placeholder="From"
+        list="ap1"
+        @keyup.delete="restore1"
+      />
+      <datalist id="ap1">
+        <option v-for="airport in airports" :key="airports.indexOf(airport)">
+          {{ airport }}
+        </option>
+      </datalist>
+      <input
+        type="text"
+        v-model="to"
+        placeholder="To"
+        list="ap2"
+        @keyup.delete="restore2"
+      />
+      <datalist id="ap2">
+        <option v-for="airport in airports" :key="airports.indexOf(airport)">
+          {{ airport }}
+        </option>
+      </datalist>
+      <input
+        type="date"
+        v-model="dateOfDeparture"
+        placeholder="Date of departure"
+      />
+
+      <button @click="searchCustom">SEARCH</button>
+
+      <!-- <div>{{search}}</div> -->
+
+      <div v-for="flight in search" :key="search.indexOf(flight)">
+        <hr />
+        <div>
+          <h4>
+            Departure Time:
+            {{ flight.departure_time.substring(11, 13) + " Hr " }}
+            {{ flight.departure_time.substring(14, 16) + " Min " }}===== Arrival
+            Time: {{ flight.arrival_time.substring(11, 13) + " Hr" }}
+            {{ flight.arrival_time.substring(14, 16) + " Min " }}
+          </h4>
+          <h4>
+            Deparure Date: {{ flight.departure_time.substring(0, 10) }} ======
+            Arrival Date: {{ flight.arrival_time.substring(0, 10) }}
+          </h4>
+          <h3>Flight Number: {{ flight.flight_number }}</h3>
+          <h3>Ticket Price: Rs.{{ flight.price }}</h3>
+          <button @click="book(flight.id,flight.flight_number,flight.price)">BOOK</button>
+        </div>
+        <hr />
+      </div>
+    </div>
+   ]
+    <script type="module">
+      import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+      const uid = "<%=uid%>";
+
+      async function logJSONData() {
+        const response = await fetch(`/user/${uid}/getFlightDetails`);
+        const jsonData = await response.json();
+
+        const app = createApp({
+          data() {
+            return {
+              dat: "hooo",
+              flights: jsonData,
+              search: [],
+              from: "",
+              to: "",
+              timeOfDay: "",
+              dateOfDeparture: "",
+              removedAirports: [],
+              airports: [
+                "Agartala(IXA)",
+                "Agra(AGR)",
+                "Ahmedabad(AMD)",
+                "Aizawl(AJL)",
+                "Amritsar(ATQ)",
+                "Aurangabad(IXU)",
+                "Bagdogra(IXB)",
+                "Bareilly(BEK)",
+                "Belagavi(IXG)",
+                "Bengaluru(BLR)",
+                "Bhopal(BHO)",
+                "Bhubaneswar(BBI)",
+                "Chandigarh(IXC)",
+                "Chennai(MAA)",
+                "Coimbatore(CJB)",
+                "Darbhanga(DBR)",
+                "Dehradun(DED)",
+                "Delhi(DEL)",
+                "Deoghar(DGH)",
+                "Dibrugarh(DIB)",
+                "Dimapur(DMU)",
+                "Durgapur(RDP)",
+                "Gaya(GAY)",
+                "Goa(GOI)",
+                "Gorakhpur(GOP)",
+                "Guwahati(GAU)",
+                "Gwalior(GWL)",
+                "Hubli(HBX)",
+                "Hyderabad(HYD)",
+                "Imphal(IMF)",
+                "Indore(IDR)",
+                "Itanagar(HGI)",
+                "Jabalpur(JLR)",
+                "Jaipur(JAI)",
+                "Jammu(IXJ)",
+                "Jodhpur(JDH)",
+                "Jorhat(JRH)",
+                "Kadapa(CDP)",
+                "Kannur(CNN)",
+                "Kanpur(KNU)",
+                "Kochi(COK)",
+                "Kolhapur(KLH)",
+                "Kolkata(CCU)",
+                "Kozhikode(CCJ)",
+                "Kurnool(KJB)",
+                "Leh(IXL)",
+                "Lucknow(LKO)",
+                "Madurai(IXM)",
+                "Mangaluru(IXE)",
+                "Mumbai(BOM)",
+                "Mysuru(MYQ)",
+                "Nagpur(NAG)",
+                "North Goa(GOX)",
+                "Pantnagar(PGH)",
+                "Patna(PAT)",
+                "Port-Blair(IXZ)",
+                "Prayagraj(IXD)",
+                "Pune(PNQ)",
+                "Raipur(RPR)",
+                "Rajahmundry(RJA)",
+                "Rajkot(RAJ)",
+                "Ranchi(IXR)",
+                "Shillong(SHL)",
+                "Shirdi(SAG)",
+                "Silchar(IXS)",
+                "Srinagar(SXR)",
+                "Surat(STV)",
+                "Thiruvananthapuram(TRV)",
+                "Tiruchirappalli(TRZ)",
+                "Tirupati(TIR)",
+                "Tuticorin(TCR)",
+                "Udaipur(UDR)",
+                "Vadodara(BDQ)",
+                "Varanasi(VNS)",
+                "Vijayawada(VGA)",
+                "Visakhapatnam(VTZ)",
+              ],
+            };
+          },
+          methods: {
+            removeAirport() {
+              const idx = this.airports.indexOf(this.from);
+              if (idx >= 0) {
+                this.removedAirports.push(this.airports[idx]);
+                this.airports.splice(idx, 1);
+              }
+            },
+            restore1() {
+              this.from = "";
+              this.to = "";
+              this.airports.push.apply(this.airports, this.removedAirports);
+              this.airports.sort();
+              this.removedAirports = [];
+            },
+            restore2() {
+              this.to = "";
+            },
+            searchCustom() {
+              this.search = [];
+              //   console.log(this.search);
+              let objForPush = [];
+              for (let flight of this.flights) {
+                if(flight.vaccancy<60){
+                if (flight.origin === this.from) {
+                  if (flight.destination === this.to) {
+                    let subDate = flight.departure_time.substring(0, 10);
+                    if (this.dateOfDeparture === subDate) {
+                      let counter = 0;
+                      let obj = {};
+
+                      for (let [key, value] of Object.entries(flight)) {
+                        obj[key] = value;
+                        counter++;
+
+                        if (counter === 9) {
+                          objForPush.push(obj);
+                          obj = {};
+                          counter = 0;
+                        }
+                      }
+                      if (counter > 0) {
+                        objForPush.push(obj);
+                      }
+                    }
+                   }
+                  }
+                }
+              }
+              this.search = objForPush;
+              // console.log(this.search);
+            },
+            book(x,y,z) {
+              async function postData(url = "", data = {}) {
+                // Default options are marked with *
+                const response = await fetch(url, {
+                  method: "POST", // *GET, POST, PUT, DELETE, etc.
+                  mode: "cors", // no-cors, *cors, same-origin
+                  cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                  credentials: "same-origin", // include, *same-origin, omit
+                  headers: {
+                    "Content-Type": "application/json",
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  redirect: "follow", // manual, *follow, error
+                  referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                  body: JSON.stringify(data), // body data type must match "Content-Type" header
+                });
+                return response.json(); // parses JSON response into native JavaScript objects
+              }
+              postData(`/user/${uid}/bookFlight`,{userId:`${uid}`,flightId:x,flightNumber:y,price:z})
+              .then((object) =>{
+                console.log(object);
+              })
+              .catch((error) =>{
+                console.log(error);
+              });
+            },
+          },
+          watch: {
+            from(newFrom, oldFrom) {
+              if (oldFrom != newFrom) {
+                this.removeAirport();
+              }
+            },
+          },
+        });
+
+        app.mount("#okay");
+        console.log(jsonData);
+      }
+
+      let fdls = logJSONData();
+    </script>
+  </body>
+</html>

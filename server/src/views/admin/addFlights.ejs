@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js" defer></script>
+  </head>
+  <style></style>
+  <body>
+    <div class="main" id="vueControl">
+    
+      <div>
+        <h1>Add Flights</h1>
+ 
+
+        <input type="text" v-model="flightNumber" placeholder="Flight Number" />
+
+        <input
+          type="text"
+          v-model="from"
+          placeholder="From"
+          list="ap1"
+          @keyup.delete="restore1"
+        />
+        <datalist id="ap1">
+          <option v-for="airport in airports" :key="airports.indexOf(airport)">
+            {{ airport }}
+          </option>
+        </datalist>
+        <input
+          type="text"
+          v-model="to"
+          placeholder="To"
+          list="ap2"
+          @keyup.delete="restore2"
+        />
+        <datalist id="ap2">
+          <option v-for="airport in airports" :key="airports.indexOf(airport)">
+            {{ airport }}
+          </option>
+        </datalist>
+        <input
+          type="date"
+          v-model="dateOfDeparture"
+          @input="validate"
+          placeholder="Date of departure"
+        />
+        <input
+          type="text"
+          @input="validate"
+          v-model="departureTimeHrs"
+          placeholder="Departure Time Hrs"
+        />
+        <input
+          type="text"
+          @input="validate"
+          v-model="departureTimeMin"
+          placeholder="Departure Time Mins"
+        />
+        <input
+          type="text"
+          @input="validate"
+          v-model="arrivalTimeHrs"
+          placeholder="Arrival Time Hrs"
+        />
+        <input
+          type="text"
+          @input="validate"
+          v-model="arrivalTimeMin"
+          placeholder="Arrival Time Mins"
+        />
+        <input type="number" placeholder="Price" v-model="price" />
+        <button @click="addFlight">ADD</button>
+
+        
+
+        <!-- <ul v-if="availableFlights.length>0">
+
+          <li  v-for="flights in availableFlights" :key="availableFlights.indexOf(flights)">
+         
+              <div >
+                  
+                  <li>id:{{flights.id}}</li>
+                  <li>Flight Number:{{flights.flight_number}}</li>
+                  <li>From:{{flights.origin}}</li>
+                  <li>To:{{flights.destination}}</li>
+                  <li>Departure:{{flights.arrival_time}}</li>
+                  <li>Arrival:{{flights.departure_time}}</li>
+                  <button @click="removeFlight">REMOVE</button>
+              </div>
+       
+          </li> -->
+          
+        </ul>
+      </div>
+      <!-- <%let test = uid%> -->
+    </div>
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js" defer></script> -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="module">
+      import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+      const uid = "<%=uid%>";
+      // const a = "<%=allFlights%>" ;
+      
+      
+    //   const axios = require('axios/dist/browser/axios.cjs');
+      // console.log(a)
+      const app = createApp({
+        data() {
+          return {
+            availableFlights:[],
+            userId: uid,
+            response:{},
+            flightNumber: "",
+            from: "",
+            to: "",
+            price: 0,
+            dateOfDeparture: "",
+            departureTimeHrs: "",
+            arrivalTimeHrs: "",
+            departureTimeMin: "",
+            arrivalTimeMin: "",
+            departureTime: "",
+            arrivalTime: "",
+            removedAirports: [],
+            airports: [
+              "Agartala(IXA)",
+              "Agra(AGR)",
+              "Ahmedabad(AMD)",
+              "Aizawl(AJL)",
+              "Amritsar(ATQ)",
+              "Aurangabad(IXU)",
+              "Bagdogra(IXB)",
+              "Bareilly(BEK)",
+              "Belagavi(IXG)",
+              "Bengaluru(BLR)",
+              "Bhopal(BHO)",
+              "Bhubaneswar(BBI)",
+              "Chandigarh(IXC)",
+              "Chennai(MAA)",
+              "Coimbatore(CJB)",
+              "Darbhanga(DBR)",
+              "Dehradun(DED)",
+              "Delhi(DEL)",
+              "Deoghar(DGH)",
+              "Dibrugarh(DIB)",
+              "Dimapur(DMU)",
+              "Durgapur(RDP)",
+              "Gaya(GAY)",
+              "Goa(GOI)",
+              "Gorakhpur(GOP)",
+              "Guwahati(GAU)",
+              "Gwalior(GWL)",
+              "Hubli(HBX)",
+              "Hyderabad(HYD)",
+              "Imphal(IMF)",
+              "Indore(IDR)",
+              "Itanagar(HGI)",
+              "Jabalpur(JLR)",
+              "Jaipur(JAI)",
+              "Jammu(IXJ)",
+              "Jodhpur(JDH)",
+              "Jorhat(JRH)",
+              "Kadapa(CDP)",
+              "Kannur(CNN)",
+              "Kanpur(KNU)",
+              "Kochi(COK)",
+              "Kolhapur(KLH)",
+              "Kolkata(CCU)",
+              "Kozhikode(CCJ)",
+              "Kurnool(KJB)",
+              "Leh(IXL)",
+              "Lucknow(LKO)",
+              "Madurai(IXM)",
+              "Mangaluru(IXE)",
+              "Mumbai(BOM)",
+              "Mysuru(MYQ)",
+              "Nagpur(NAG)",
+              "North Goa(GOX)",
+              "Pantnagar(PGH)",
+              "Patna(PAT)",
+              "Port-Blair(IXZ)",
+              "Prayagraj(IXD)",
+              "Pune(PNQ)",
+              "Raipur(RPR)",
+              "Rajahmundry(RJA)",
+              "Rajkot(RAJ)",
+              "Ranchi(IXR)",
+              "Shillong(SHL)",
+              "Shirdi(SAG)",
+              "Silchar(IXS)",
+              "Srinagar(SXR)",
+              "Surat(STV)",
+              "Thiruvananthapuram(TRV)",
+              "Tiruchirappalli(TRZ)",
+              "Tirupati(TIR)",
+              "Tuticorin(TCR)",
+              "Udaipur(UDR)",
+              "Vadodara(BDQ)",
+              "Varanasi(VNS)",
+              "Vijayawada(VGA)",
+              "Visakhapatnam(VTZ)",
+            ],
+          };
+        },
+        methods: {
+          validate() {
+            if (this.departureTimeHrs < 0 || this.departureTimeHrs > 23) {
+              alert("Enter hours under 24");
+              this.departureTimeHrs = 0;
+            }
+            if (this.arrivalTimeHrs < 0 || this.arrivalTimeHrs > 23) {
+              alert("Enter hours under 24");
+              this.arrivalTimeHrs = 0;
+            }
+            if (this.departureTimeMin < 0 || this.departureTimeMin > 59) {
+              alert("Enter minutes under 60");
+              this.departureTimeMin = 0;
+            }
+            if (this.arrivalTimeMin < 0 || this.arrivalTimeMin > 59) {
+              alert("Enter minutes under 60");
+              this.arrivalTimeMin = 0;
+            }
+            
+          },
+          goToRemoveFlight() {
+            window.location.href = `/admin/${this.userId}/removeFlight`;
+          },
+          viewAllBookings() {
+            window.location.href = `/admin/${this.userId}/viewAllBookings`;
+          },
+          removeAirport() {
+            const idx = this.airports.indexOf(this.from);
+            if (idx >= 0) {
+              this.removedAirports.push(this.airports[idx]);
+              this.airports.splice(idx, 1);
+            }
+          },
+          restore1() {
+            this.from = "";
+            this.to = "";
+            this.airports.push.apply(this.airports, this.removedAirports);
+            this.airports.sort();
+            this.removedAirports = [];
+          },
+          restore2() {
+            this.to = "";
+          },
+            addFlight() {
+            axios({
+              method: "post",
+              url: `/admin/${this.userId}/addFlights`,
+              data: {
+                flightNumber:this.flightNumber,
+                dateOfDeparture:this.dateOfDeparture,
+                from:this.from,
+                to:this.to,
+                arrivalTimeHrs:this.arrivalTimeHrs,
+                departureTimeHrs:this.departureTimeHrs,
+                arrivalTimeMin:this.arrivalTimeMin,
+                departureTimeMin:this.departureTimeMin,
+                price:this.price
+              },
+            }).then((obj) => {console.log(obj)});
+              // window.location.href=`/admin/${this.userId}/removeFlights`;
+              
+            }
+      
+            // // console.log(response.data);
+            // for(let x of response.data){
+              //   this.availableFlights.push(x)
+              // }
+
+            // this.response = JSON.stringify(response);
+            // // this.availableFlights = JSON.stringify(this.response.data);
+            // console.log(this.response.data);
+          ,
+        },
+        watch: {
+          from(newFrom, oldFrom) {
+            if (oldFrom != newFrom) {
+              this.removeAirport();
+            }
+          },
+        },
+      });
+
+      app.mount("#vueControl");
+    </script>
+  </body>
+</html>
